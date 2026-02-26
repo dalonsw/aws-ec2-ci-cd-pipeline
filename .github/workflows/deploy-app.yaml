@@ -34,6 +34,7 @@ jobs:
 
   deploy:
     name: deploy
+    needs: build
     runs-on: ubuntu-latest
     env:
       AWS_INSTANCE_SG_ID: ${{ vars.AWS_INSTANCE_SG_ID }}
