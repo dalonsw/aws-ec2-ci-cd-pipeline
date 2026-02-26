@@ -75,11 +75,11 @@ jobs:
           chmod 700 ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/${{ secrets.SSH_KEY_NAME }}
           chmod 600 ~/.ssh/${{ secrets.SSH_KEY_NAME }}
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${ HOSTNAME } >> ~/.ssh/known_hosts
 
       - name: Enviar artefato
         run: |
-          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} dist.tar.gz user@${{ secrets.SERVER_IP }}:/var/www/html
+          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} dist.tar.gz ${ USER_NAME }@${ HOSTNAME }:/var/www/html
 
       - name: Restart Nginx
         run: sudo systemctl restart nginx
