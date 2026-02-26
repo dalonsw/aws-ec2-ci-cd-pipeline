@@ -71,15 +71,13 @@ jobs:
 
       - name: Setup SSH
         run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/${{ secrets.SSH_KEY_NAME }}
-          chmod 600 ~/.ssh/${{ secrets.SSH_KEY_NAME }}
-          ssh-keyscan -H -p 22 $HOSTNAME >> ~/.ssh/known_hosts
+          cd ~/
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ${{ secrets.SSH_KEY_NAME }} && chmod 600 ${{ secrets.SSH_KEY_NAME }}
+
 
       - name: Enviar artefato
         run: |
-          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} dist.tar.gz $USER_NAME@$HOSTNAME:/var/www/html
+          scp -i ~/${{ secrets.SSH_KEY_NAME }} dist.tar.gz $USER_NAME@$HOSTNAME:/var/www/html
 
       - name: Restart Nginx
-        run: ssh -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} $USER_NAME@$HOSTNAME "sudo systemctl restart nginx"
+        run: ssh -i ~/${{ secrets.SSH_KEY_NAME }} $USER_NAME@$HOSTNAME "sudo systemctl restart nginx"
