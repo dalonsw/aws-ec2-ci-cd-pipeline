@@ -1,9 +1,9 @@
 name: Deploy APP em uma EC2 da AWS
 
 on:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -80,7 +80,7 @@ jobs:
 
       - name: Enviar build
         run: |
-          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/${{ secrets.SSH_KEY_NAME }}"  $USER_NAME@$HOSTNAME:/var/www/html/
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/${{ secrets.SSH_KEY_NAME }}" /home/runner/work/aws-ec2-ci-cd-pipeline/aws-ec2-ci-cd-pipeline $USER_NAME@$HOSTNAME:/var/www/html/
 
       - name: Restart Nginx
         run: |
