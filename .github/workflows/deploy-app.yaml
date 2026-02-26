@@ -69,8 +69,8 @@ jobs:
         with:
           name: build
 
-      - name: Extrair build
-        run: unzip build.zip -d build
+      - name: Debug ver arquivos
+        run: ls -la
 
       - name: Setup SSH
         run: |
@@ -80,7 +80,7 @@ jobs:
 
       - name: Enviar artefato
         run: |
-          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} -r build/* $USER_NAME@$HOSTNAME:/var/www/html
+          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} -r react-app/dist/* $USER_NAME@$HOSTNAME:/var/www/html
 
       - name: Restart Nginx
         run: |
