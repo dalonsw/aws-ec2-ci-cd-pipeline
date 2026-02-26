@@ -1,0 +1,81 @@
+name: Deploy APP em uma EC2 da AWS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Run node CI
+        run: npm ci
+
+      - name: Build App
+        run: npm run build
+
+      - name: Upload artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: react-app/dist/
+
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    env:
+      AWS_INSTANCE_SG_ID: ${{ vars.AWS_INSTANCE_SG_ID }}
+      HOSTNAME: ${{ secrets.SSH_HOST }}
+      USER_NAME: ${{ secrets.USER_NAME }}
+
+    steps: 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Pegar IP do utilizador
+        id: get_ip
+        run: echo"IP=$(curl -s https://checkip.amazonaws.com)" > $GITHUB_ENV
+
+      - name: Adicionar IP do utilizador ao SG
+        run: |
+            aws ec2 authorize-security-group-ingress \
+            --group-id $AWS_INSTANCE_SG_ID \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ env.IP }}/32 
+
+      - name: Baixar Artefato
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/${{ secrets.SSH_KEY_NAME }}
+          chmod 600 ~/.ssh/${{ secrets.SSH_KEY_NAME }}
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Enviar artefato
+        run: |
+          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} dist.tar.gz user@${{ secrets.SERVER_IP }}:/var/www/html
+
+      - name: Restart Nginx
+        run: sudo systemctl restart nginx
