@@ -77,7 +77,7 @@ jobs:
 
       - name: Enviar artefato
         run: |
-          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} -r * $USER_NAME@$HOSTNAME:/var/www/html
+          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} -r * $USER_NAME@$HOSTNAME:~/react-app
 
       - name: Restart Nginx
         run: |
