@@ -40,29 +40,29 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      # AWS_INSTANCE_SG_ID: ${{ vars.AWS_INSTANCE_SG_ID }}
+      AWS_INSTANCE_SG_ID: ${{ vars.AWS_INSTANCE_SG_ID }}
       HOSTNAME: ${{ secrets.SSH_HOST }}
       USER_NAME: ${{ secrets.USER_NAME }}
 
     steps: 
-      # - name: Configure AWS Credentials
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: us-east-1
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-      # - name: Pegar IP do utilizador
-      #   id: get_ip
-      #   run: echo "IP=$(curl -s https://checkip.amazonaws.com)" > $GITHUB_ENV
+      - name: Pegar IP do utilizador
+        id: get_ip
+        run: echo "IP=$(curl -s https://checkip.amazonaws.com)" > $GITHUB_ENV
 
-      # - name: Adicionar IP do utilizador ao SG
-      #   run: |
-      #       aws ec2 authorize-security-group-ingress \
-      #       --group-id $AWS_INSTANCE_SG_ID \
-      #       --protocol tcp \
-      #       --port 22 \
-      #       --cidr ${{ env.IP }}/32 
+      - name: Adicionar IP do utilizador ao SG
+        run: |
+            aws ec2 authorize-security-group-ingress \
+            --group-id $AWS_INSTANCE_SG_ID \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ env.IP }}/32 
 
       - name: Baixar Artefato
         uses: actions/download-artifact@v4
