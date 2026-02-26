@@ -52,9 +52,9 @@ jobs:
       #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       #     aws-region: us-east-1
 
-      - name: Pegar IP do utilizador
-        id: get_ip
-        run: echo "HOSTNAME=$(curl -s https://checkip.amazonaws.com)" > $GITHUB_ENV
+      # - name: Pegar IP do utilizador
+      #   id: get_ip
+      #   run: echo "IP=$(curl -s https://checkip.amazonaws.com)" > $GITHUB_ENV
 
       # - name: Adicionar IP do utilizador ao SG
       #   run: |
@@ -71,13 +71,14 @@ jobs:
 
       - name: Setup SSH
         run: |
-          cd ~/
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ${{ secrets.SSH_KEY_NAME }} && chmod 600 ${{ secrets.SSH_KEY_NAME }}
-
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/${{ secrets.SSH_KEY_NAME }}
+          chmod 600 ~/.ssh/${{ secrets.SSH_KEY_NAME }}
 
       - name: Enviar artefato
         run: |
-          scp -i ~/${{ secrets.SSH_KEY_NAME }} dist.tar.gz $USER_NAME@$HOSTNAME:/var/www/html
+          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} dist.tar.gz $USER_NAME@$HOSTNAME:/var/www/html
 
       - name: Restart Nginx
-        run: ssh -i ~/${{ secrets.SSH_KEY_NAME }} $USER_NAME@$HOSTNAME "sudo systemctl restart nginx"
+        run: |
+          ssh -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} $USER_NAME@$HOSTNAME "sudo systemctl restart nginx"
