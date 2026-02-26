@@ -75,9 +75,9 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/${{ secrets.SSH_KEY_NAME }}
           chmod 600 ~/.ssh/${{ secrets.SSH_KEY_NAME }}
 
-      - name: Enviar artefato
+      - name: Enviar build
         run: |
-          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} -r * $USER_NAME@$HOSTNAME:~/react-app
+          rsync -avz -e "ssh -i ~/.ssh/${{ secrets.SSH_KEY_NAME }}" ./ $USER_NAME@$HOSTNAME:/var/www/html/
 
       - name: Restart Nginx
         run: |
