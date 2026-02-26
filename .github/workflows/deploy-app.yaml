@@ -69,9 +69,6 @@ jobs:
         with:
           name: build
 
-      - name: Debug ver arquivos
-        run: ls -la
-
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -80,7 +77,7 @@ jobs:
 
       - name: Enviar artefato
         run: |
-          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} -r react-app/dist/* $USER_NAME@$HOSTNAME:/var/www/html
+          scp -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} -r * $USER_NAME@$HOSTNAME:/var/www/html
 
       - name: Restart Nginx
         run: |
