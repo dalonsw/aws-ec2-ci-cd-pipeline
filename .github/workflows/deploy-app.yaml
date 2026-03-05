@@ -73,16 +73,16 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/${{ secrets.SSH_KEY_NAME }}
-          chmod 600 ~/.ssh/${{ secrets.SSH_KEY_NAME }}
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/${{ secrets.SSH_KEY_NAME }}
+          chmod 600 ~/${{ secrets.SSH_KEY_NAME }}
 
       - name: Enviar build
         run: |
-          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/${{ secrets.SSH_KEY_NAME }}" ./build/ $USER_NAME@$HOSTNAME:/home/$USER_NAME/react-app
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ~/${{ secrets.SSH_KEY_NAME }}" ./build/ $USER_NAME@$HOSTNAME:/home/$USER_NAME/react-app
 
       - name: Restart Nginx
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} $USER_NAME@$HOSTNAME "sudo systemctl restart nginx"
+          ssh -o StrictHostKeyChecking=no -i ~/${{ secrets.SSH_KEY_NAME }} $USER_NAME@$HOSTNAME "sudo systemctl restart nginx"
         
       - name: Remover IP do utilizador do SG
         if: always()
