@@ -85,7 +85,7 @@ jobs:
 
       - name: Enviar build para o Nginx
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} $USER_NAME@$HOSTNAME "sudo cp -r /home/$USER_NAME/react-app/* /usr/share/nginx/html/"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} $USER_NAME@$HOSTNAME "sudo cp -r /home/$USER_NAME/react-app/build/* /usr/share/nginx/html/"
 
       - name: Restart Nginx
         run: |
