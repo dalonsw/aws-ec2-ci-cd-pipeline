@@ -54,7 +54,7 @@ jobs:
 
       - name: Pegar IP do utilizador
         id: get_ip
-        run: echo "IP=$(curl -s https://checkip.amazonaws.com)" > $GITHUB_ENV
+        run: echo "IP=$(curl -s https://checkip.amazonaws.com)" >> $GITHUB_ENV
 
       - name: Adicionar IP do utilizador ao SG
         run: |
@@ -62,15 +62,13 @@ jobs:
             --group-id $AWS_INSTANCE_SG_ID \
             --protocol tcp \
             --port 22 \
-            --cidr ${{ env.IP }}/32 
+            --cidr $IP/32 
 
       - name: Baixar Artefato
         uses: actions/download-artifact@v4
         with:
           name: build
-
-      - name: Ver path
-        run: pwd
+          path: ./build
 
       - name: Setup SSH
         run: |
@@ -80,8 +78,17 @@ jobs:
 
       - name: Enviar build
         run: |
-          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/${{ secrets.SSH_KEY_NAME }}" /home/runner/work/aws-ec2-ci-cd-pipeline/aws-ec2-ci-cd-pipeline $USER_NAME@$HOSTNAME:/home/$USER_NAME/react-app
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/${{ secrets.SSH_KEY_NAME }}" ./build/ $USER_NAME@$HOSTNAME:/home/$USER_NAME/react-app
 
       - name: Restart Nginx
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/${{ secrets.SSH_KEY_NAME }} $USER_NAME@$HOSTNAME "sudo systemctl restart nginx"
+        
+      - name: Remover IP do utilizador do SG
+        if: always()
+        run: |
+            aws ec2 revoke-security-group-ingress \
+            --group-id $AWS_INSTANCE_SG_ID \
+            --protocol tcp \
+            --port 22 \
+            --cidr $IP/32
