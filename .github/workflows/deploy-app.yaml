@@ -82,7 +82,7 @@ jobs:
 
       - name: Enviar build
         run: |
-          rsync -avz -e --delete "ssh -o StrictHostKeyChecking=no -i ~/.ssh/${{ secrets.SSH_KEY_NAME }}" /home/runner/work/aws-ec2-ci-cd-pipeline/aws-ec2-ci-cd-pipeline/build $USER_NAME@$HOSTNAME:/home/$USER_NAME/react-app
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/${{ secrets.SSH_KEY_NAME }}" /home/runner/work/aws-ec2-ci-cd-pipeline/aws-ec2-ci-cd-pipeline/build $USER_NAME@$HOSTNAME:/home/$USER_NAME/react-app
 
       - name: Restart Nginx
         run: |
